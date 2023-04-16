@@ -1,24 +1,69 @@
 package com.example.mediaplayback.di
 
 import android.content.Context
-import com.example.mediaplayback.BaseApplication
+import com.google.android.exoplayer2.C
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.database.DefaultDatabaseProvider
+import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
+import com.google.android.exoplayer2.upstream.DefaultDataSource
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
-
+import dagger.hilt.android.scopes.ServiceScoped
+import java.io.File
 
 @Module
-@InstallIn(SingletonComponent::class)
-class AppModule {
+@InstallIn(ServiceComponent::class)
+object ServiceModule {
 
-@Singleton
-@Provides
- fun provideApplication(@ApplicationContext context: Context?): BaseApplication {
-    return context as BaseApplication
-}
+    @Provides
+    @ServiceScoped
+    fun provideAudioAttribute(): AudioAttributes =
+        AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            .setUsage(C.USAGE_MEDIA)
+            .build()
+
+    @Provides
+    @ServiceScoped
+    fun provideExoPlayer(
+        @ApplicationContext context: Context,
+        audioAttributes: AudioAttributes
+    ): ExoPlayer = ExoPlayer.Builder(context).build().apply {
+        setAudioAttributes(audioAttributes, true)
+        setHandleAudioBecomingNoisy(true)
+    }
+
+
+
+    @Provides
+    @ServiceScoped
+    fun provideDataSourceFactory(
+        @ApplicationContext context: Context
+    ) =  DefaultDataSource.Factory(context)
+
+            @Provides
+            @ServiceScoped
+    fun provideCacheDataSourceFactory(
+        @ApplicationContext context: Context,
+        dataSource: DefaultDataSource.Factory
+
+    ): CacheDataSource.Factory {
+                val caheDir = File(context.cacheDir, "media")
+                val databaseprovider = StandaloneDatabaseProvider(context)
+                val cache = SimpleCache(caheDir,NoOpCacheEvictor(),databaseprovider)
+                return  CacheDataSource.Factory().apply {
+                    setCache(cache)
+                    setUpstreamDataSourceFactory(dataSource)
+                }
+    }
+
+
 
 
 }

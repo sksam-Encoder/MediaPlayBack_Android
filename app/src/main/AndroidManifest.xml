@@ -34,6 +34,16 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+        <service
+            android:name=".media.constant.service.MediaPlayerService"
+            android:exported="false">
+
+            <intent-filter>
+                <action android:name="android.media.browser.MediaBrowserService" />
+            </intent-filter>
+
+        </service>
     </application>
 
 </manifest>

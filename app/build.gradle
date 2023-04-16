@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.example.mediaplayback'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.mediaplayback"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -80,6 +80,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
 
     implementation 'androidx.media:media:1.6.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.5'
+
 
 
 }
